@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+/* EduPeak styling entry point. Keep this import order stable: tokens -> base -> layout -> components -> themes -> responsive. */
+@import "./styles/design-tokens.css";
+@import "./styles/reset.css";
+@import "./styles/typography.css";
+@import "./styles/layout.css";
+@import "./styles/navigation.css";
+@import "./styles/components.css";
+@import "./styles/authentication.css";
+@import "./styles/themes.css";
+@import "./styles/modules.css";
+@import "./styles/responsive.css";
