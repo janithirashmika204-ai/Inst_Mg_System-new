@@ -1,0 +1,8 @@
+/* Typography scale and consistent font inheritance. */
+html, body, #root, button, input, select, textarea { font-family: "Anthropic Sans", "Segoe UI", system-ui, sans-serif; }
+h1, h2, h3, h4, h5, h6 { margin-top: 0; color: var(--ep-text); font-family: inherit; }
+.app-main h1, .app-main h2, .app-main h3, .app-main h4 { color: var(--ep-text); letter-spacing: -.025em; }
+.app-main h1 { font-size: clamp(23px, 2.2vw, 31px); font-weight: 760; line-height: 1.18; }
+.app-main h2 { font-weight: 720; }
+.app-main p { line-height: 1.55; }
+small, .text-muted { color: var(--ep-muted); }

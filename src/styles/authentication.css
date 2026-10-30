@@ -1,0 +1,434 @@
+/* Login and authentication page presentation. Existing split-screen layout retained. */
+.ep-login-page,
+      .ep-login-page * {
+        box-sizing: border-box;
+      }
+
+      .ep-login-page {
+        font-family: 'Anthropic Sans', sans-serif;
+        background-color: var(--ep-surface);
+        color: var(--ep-text);
+        height: 100vh;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      .ep-login-layout {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+
+      .ep-login-left {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 4rem 5rem;
+        background: var(--ep-surface);
+        overflow-y: auto;
+        max-width: 650px;
+        min-width: 0;
+      }
+
+      .ep-login-brand {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--ep-text);
+      }
+
+      .ep-login-brand svg {
+        width: 28px;
+        height: 28px;
+        color: var(--ep-accent);
+      }
+
+      .ep-login-brand-dot {
+        color: var(--ep-accent);
+      }
+
+      .ep-login-content {
+        margin: auto 0;
+        width: 100%;
+        max-width: 420px;
+      }
+
+      .ep-login-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--ep-text);
+        margin-bottom: .5rem;
+        letter-spacing: -.02em;
+      }
+
+      .ep-login-subtitle {
+        font-size: .95rem;
+        color: var(--ep-muted);
+        margin-bottom: 2.5rem;
+        line-height: 1.5;
+      }
+
+      .ep-login-input-block {
+        margin-bottom: 1.25rem;
+      }
+
+      .ep-login-label {
+        display: block;
+        font-size: .75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: var(--ep-muted);
+        margin-bottom: .5rem;
+      }
+
+      /* Identical input containers for username and password */
+      .ep-login-page .ep-login-input-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 52px;
+        margin: 0;
+        padding: 0;
+        background: var(--ep-surface) !important;
+        border: 1px solid var(--ep-border) !important;
+        border-radius: 12px !important;
+        box-shadow: none !important;
+        outline: none !important;
+        overflow: hidden;
+        transition: border-color .18s ease;
+      }
+
+      /* Consistent, subtle focus state; no oversized glow */
+      .ep-login-page .ep-login-input-wrap:focus-within {
+        background: var(--ep-surface) !important;
+        border: 1px solid var(--ep-muted-soft) !important;
+        border-radius: 12px !important;
+        box-shadow: none !important;
+        outline: none !important;
+      }
+
+      /* Icons stay inside the same border as their input */
+      .ep-login-page .ep-login-input-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 46px;
+        width: 46px;
+        height: 100%;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        outline: none !important;
+        color: var(--ep-muted-soft) !important;
+      }
+
+      .ep-login-page .ep-login-input-icon svg {
+        display: block;
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+        margin: 0;
+        padding: 0;
+        fill: currentColor !important;
+        stroke: none !important;
+      }
+
+      /* Identical sizing and typography for both inputs */
+      .ep-login-page .ep-login-control {
+        display: block;
+        flex: 1 1 auto;
+        width: 100%;
+        min-width: 0;
+        height: 100%;
+        margin: 0 !important;
+        padding: 0 14px 0 0 !important;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        outline: none !important;
+        color: var(--ep-text) !important;
+        font-family: 'Anthropic Sans', sans-serif !important;
+        font-size: .95rem;
+        font-weight: 400;
+        line-height: normal;
+        appearance: none;
+        -webkit-appearance: none;
+      }
+
+      .ep-login-page .ep-login-control:focus,
+      .ep-login-page .ep-login-control:focus-visible,
+      .ep-login-page .ep-login-control:active {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        outline: none !important;
+      }
+
+      .ep-login-page .ep-login-control::placeholder {
+        color: var(--ep-muted-soft) !important;
+        opacity: 1;
+        font-family: 'Anthropic Sans', sans-serif !important;
+        font-size: .95rem;
+        font-weight: 400;
+      }
+
+     
+
+      .ep-login-submit {
+        box-sizing: border-box;
+        -webkit-appearance: none;
+        appearance: none;
+        --btn-bg: var(--ep-accent);
+        --btn-fg: var(--ep-on-accent);
+        --btn-focus: var(--ep-accent-strong);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6em;
+        width: 100%;
+        --btn-icon-size: 1em;
+        padding: 15px 38px;
+        vertical-align: middle;
+        touch-action: manipulation;
+        user-select: none;
+        border: 0;
+        border-radius: 40px;
+        background: var(--btn-bg);
+        color: var(--btn-fg);
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.2;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+        text-decoration: none;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        box-shadow: 0px 10px 24px 0px rgba(0, 0, 0, 0.3);
+        transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1), background-color 0.18s cubic-bezier(0.2, 0.7, 0.3, 1), color 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
+      }
+      .ep-login-submit > .ep-login-submit__icon,
+      .ep-login-submit > svg,
+      .ep-login-submit > img {
+        display: block;
+        flex: 0 0 auto;
+        width: var(--btn-icon-size, 1em);
+        height: var(--btn-icon-size, 1em);
+        margin: 0;
+      }
+      .ep-login-submit > img {
+        object-fit: contain;
+      }
+      @media (hover: hover) and (pointer: fine) {
+        .ep-login-submit:hover {
+          background-color: var(--btn-fg);
+          color: var(--btn-bg);
+        }
+      }
+      .ep-login-submit:active {
+        transform: translateY(1px);
+      }
+      .ep-login-submit:focus-visible {
+        outline: 4px solid var(--btn-focus);
+        outline-offset: 3px;
+      }
+      .ep-login-submit:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+      .ep-login-submit:disabled:hover,
+      .ep-login-submit:disabled:active {
+        transform: none;
+        background: var(--btn-bg);
+        color: var(--btn-fg);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .ep-login-submit,
+        .ep-login-submit:hover,
+        .ep-login-submit:active {
+          transition: none !important;
+          transform: none !important;
+        }
+      }
+      @media (forced-colors: active) {
+        .ep-login-submit {
+          border: 1px solid ButtonBorder;
+          background: ButtonFace;
+          color: ButtonText;
+          box-shadow: none;
+        }
+        .ep-login-submit:focus-visible {
+          outline: 2px solid Highlight;
+          outline-offset: 3px;
+        }
+        .ep-login-submit:disabled {
+          color: GrayText;
+          border-color: GrayText;
+        }
+        .ep-login-submit > .ep-login-submit__icon,
+        .ep-login-submit > svg,
+        .ep-login-submit > img {
+          color: currentColor;
+        }
+      }
+
+      .ep-login-footer-note {
+        font-size: .8rem;
+        color: var(--ep-muted-soft);
+        line-height: 1.6;
+      }
+
+      /* Right-side showcase */
+      .ep-login-right {
+        flex: 1.2;
+        background: radial-gradient(
+          circle at top right,
+           #495b85 30% 0%,
+           #5d6369 60%, 
+           #2e37ad 100%
+        );
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 5rem;
+        color: var(--ep-surface);
+        overflow: hidden;
+        min-width: 0;
+      }
+
+      .ep-login-right::before {
+        content: '';
+        position: absolute;
+        top: -20%;
+        right: -20%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          rgba(59,130,246,.15) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .ep-login-showcase-tag {
+        font-size: .75rem;
+        font-weight: 600;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--ep-accent-hover);
+        margin-bottom: 1.5rem;
+      }
+
+      .ep-login-showcase-title {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.15;
+        letter-spacing: -.03em;
+        margin-bottom: 1.25rem;
+      }
+
+      .ep-login-showcase-title span {
+        color: var(--ep-accent-hover);
+      }
+
+      .ep-login-showcase-desc {
+        font-size: 1.05rem;
+        color: var(--ep-muted-soft);
+        max-width: 460px;
+        line-height: 1.6;
+        margin-bottom: 3rem;
+      }
+
+      .ep-login-features {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        max-width: 540px;
+      }
+
+      .ep-login-feature {
+        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 16px;
+        padding: 1.25rem;
+        backdrop-filter: blur(10px);
+        transition: all .3s ease;
+      }
+
+      .ep-login-feature:hover {
+        background: rgba(255,255,255,.06);
+        border-color: rgba(255,255,255,.15);
+      }
+
+      .ep-login-feature-icon {
+        color: var(--ep-accent-hover);
+        margin-bottom: .75rem;
+      }
+
+      .ep-login-feature-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+      }
+
+      .ep-login-feature-title {
+        font-size: .95rem;
+        font-weight: 600;
+        color: var(--ep-card-raised);
+        margin-bottom: .25rem;
+      }
+
+      .ep-login-feature-subtitle {
+        font-size: .8rem;
+        color: var(--ep-muted-soft);
+      }
+
+      .ep-login-showcase-footer {
+        font-size: .8rem;
+        color: var(--ep-muted);
+      }
+
+      .ep-login-error {
+        background: var(--ep-danger-soft);
+        color: var(--ep-danger);
+        padding: 12px;
+        border-radius: 9px;
+        margin: -1.5rem 0 1rem;
+        font-size: .85rem;
+      }
+
+      @media (max-width: 1024px) {
+        .ep-login-right {
+          display: none;
+        }
+
+        .ep-login-left {
+          max-width: 100%;
+          padding: 3rem 2rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .ep-login-left {
+          padding: 2rem 1.25rem;
+        }
+
+        .ep-login-title {
+          font-size: 1.8rem;
+        }
+      }

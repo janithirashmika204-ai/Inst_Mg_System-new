@@ -1,0 +1,66 @@
+/* Application frame and page layout. */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100vw;
+  min-width: 0;
+  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  color: var(--ep-text);
+  background: var(--ep-bg);
+  font-family: inherit;
+  white-space: normal;
+  overflow: hidden;
+}
+.app-content-shell {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  height: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: transparent;
+}
+.app-main {
+  flex: 1 0 auto;
+  width: min(100%, var(--ep-content-max));
+  max-width: var(--ep-content-max);
+  min-width: 0;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  min-height: 100%;
+  padding: clamp(18px, 2.5vw, 34px) clamp(14px, 3vw, 42px) 82px;
+  overflow-x: clip;
+  color: var(--ep-text);
+}
+.app-main > *, .app-main [style*="grid-template-columns"], .app-main [style*="gridTemplateColumns"] { min-width: 0; }
+.app-main [style*="overflowX"] { max-width: 100%; }
+.page-enter { animation: ep-page-enter 260ms cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes ep-page-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ep-scan-line { 0% { top: 0; opacity: 1; } 45% { top: calc(100% - 2px); opacity: 1; } 50% { opacity: 0; } 55% { top: 0; opacity: 0; } 60%,100% { opacity: 1; top: 0; } }
+@keyframes ep-modal-enter { from { opacity: 0; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.app-content-shell::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: min(470px, 65vh);
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 470' fill='none'%3E%3Cg stroke='%23647792' stroke-opacity='.24' stroke-width='1.15'%3E%3Cpath d='M-80 230C170 35 300 35 520 205S860 385 1080 190 1430 35 1680 210'/%3E%3Cpath d='M-80 250C170 55 300 55 520 225S860 405 1080 210 1430 55 1680 230'/%3E%3Cpath d='M-80 270C170 75 300 75 520 245S860 425 1080 230 1430 75 1680 250'/%3E%3Cpath d='M-80 290C170 95 300 95 520 265S860 445 1080 250 1430 95 1680 270'/%3E%3Cpath d='M-80 310C170 115 300 115 520 285S860 465 1080 270 1430 115 1680 290'/%3E%3Cpath d='M-80 330C170 135 300 135 520 305S860 485 1080 290 1430 135 1680 310'/%3E%3Cpath d='M-80 350C170 155 300 155 520 325S860 505 1080 310 1430 155 1680 330'/%3E%3Cpath d='M-80 370C170 175 300 175 520 345S860 525 1080 330 1430 175 1680 350'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: min(calc(100% + 220px), 1720px) auto;
+  opacity: .34;
+}

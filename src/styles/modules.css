@@ -1,0 +1,19 @@
+/* Module-specific visual patterns and print/scanner states. */
+.att-scan-line { position: absolute; left: 0; right: 0; height: 2px; border-radius: 2px; background: var(--ep-accent); box-shadow: 0 0 8px 2px var(--ep-accent-glow); animation: ep-scan-line 2s linear infinite; }
+@keyframes ep-nfc-pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.06); opacity: .8; } }
+.grid-att, .grid-reg, .grid-reg-top, .grid-2 { min-width: 0; }
+.dashboard-setup-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.dashboard-setup-item { display:flex; align-items:center; gap:11px; width:100%; min-width:0; padding:11px 9px !important; border:0 !important; border-bottom:1px solid var(--ep-border) !important; border-radius:9px !important; background:transparent !important; color:var(--ep-text) !important; text-align:left; cursor:pointer; transition:background-color var(--ep-transition), transform var(--ep-transition); }
+.dashboard-setup-item:hover { background:var(--ep-accent-soft) !important; transform:translateX(2px); }
+.dashboard-setup-item:focus-visible { outline:2px solid var(--ep-accent) !important; outline-offset:2px; }
+.dashboard-setup-status { display:inline-flex; flex:0 0 auto; }
+.dashboard-setup-copy { display:flex; flex:1; flex-direction:column; gap:3px; min-width:0; }
+.dashboard-setup-copy strong { color:var(--ep-text); font-size:12.5px; font-weight:700; }
+.dashboard-setup-copy small { color:var(--ep-muted); font-size:10.5px; }
+.dashboard-setup-arrow { flex:0 0 auto; color:var(--ep-muted-soft); transition:transform var(--ep-transition), color var(--ep-transition); }
+.dashboard-setup-item:hover .dashboard-setup-arrow { color:var(--ep-accent); transform:translateX(2px); }
+@media print {
+  body * { visibility: hidden; }
+  .thermal-receipt, .thermal-receipt * { visibility: visible; }
+  .thermal-receipt { position: fixed; inset: 0; width: 80mm; margin: 0 auto; font-family: "Courier New", monospace; font-size: 12px; color: #000; background: #fff; }
+}

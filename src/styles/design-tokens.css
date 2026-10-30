@@ -1,0 +1,114 @@
+/* EduPeak design tokens — the single source of truth for visual decisions. */
+@font-face {
+  font-family: "Anthropic Sans";
+  src: url("/fonts/AnthropicSans-Romans.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+  --ep-bg: #F8FAFC;
+  --ep-surface: #FFFFFF;
+  --ep-card: #FFFFFF;
+  --ep-card-raised: #F1F5F9;
+  --ep-subtle: #F1F5F9;
+  --ep-border: #E2E8F0;
+  --ep-border-strong: #CBD5E1;
+  --ep-text: #0F172A;
+  --ep-muted: #475569;
+  --ep-muted-soft: #64748B;
+  --ep-accent: #4F46E5;
+  --ep-accent-strong: #4338CA;
+  --ep-accent-hover: #4338CA;
+  --ep-accent-2: #0EA5E9;
+  --ep-accent-soft: color-mix(in srgb, var(--ep-accent) 9%, transparent);
+  --ep-accent-glow: color-mix(in srgb, var(--ep-accent) 22%, transparent);
+  --ep-on-accent: #FFFFFF;
+  --ep-overlay: rgba(15, 23, 42, .42);
+  --ep-nav-glass: rgba(255,255,255,.94);
+  --ep-success: #15803D;
+  --ep-success-soft: #DCFCE7;
+  --ep-warning: #B45309;
+  --ep-warning-soft: #FEF3C7;
+  --ep-danger: #DC2626;
+  --ep-danger-soft: #FEE2E2;
+  --ep-info: #0284C7;
+  --ep-info-soft: #E0F2FE;
+  --ep-chart-1: #4F46E5;
+  --ep-chart-2: #0EA5E9;
+  --ep-chart-3: #F59E0B;
+  --ep-chart-4: #16A34A;
+  --ep-chart-5: #E11D48;
+  --ep-chart-6: #8B5CF6;
+  --ep-radius-xs: 6px;
+  --ep-radius-sm: 9px;
+  --ep-radius-md: 12px;
+  --ep-radius-lg: 16px;
+  --ep-radius-xl: 20px;
+  --ep-shadow-sm: 0 1px 3px rgba(15, 23, 42, .05), 0 2px 8px rgba(15, 23, 42, .035);
+  --ep-shadow-md: 0 8px 22px rgba(15, 23, 42, .07);
+  --ep-shadow-lg: 0 18px 48px rgba(15, 23, 42, .14);
+  --ep-shadow-overlay: 0 26px 72px rgba(15, 23, 42, .22);
+  --ep-space-1: 4px;
+  --ep-space-2: 8px;
+  --ep-space-3: 12px;
+  --ep-space-4: 16px;
+  --ep-space-5: 20px;
+  --ep-space-6: 24px;
+  --ep-space-8: 32px;
+  --ep-space-10: 40px;
+  --ep-content-max: 1540px;
+  --ep-nav-height: 76px;
+  --ep-control-height: 40px;
+  --ep-transition-fast: 140ms ease;
+  --ep-transition: 180ms ease;
+  font-family: "Anthropic Sans", "Segoe UI", system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme="dark"],
+.app-shell[data-theme="dark"] {
+  color-scheme: dark;
+  --ep-bg: #0F172A;
+  --ep-surface: #172337;
+  --ep-card: #1E293B;
+  --ep-card-raised: #27364B;
+  --ep-subtle: #263449;
+  --ep-border: #334155;
+  --ep-border-strong: #475569;
+  --ep-text: #F1F5F9;
+  --ep-muted: #CBD5E1;
+  --ep-muted-soft: #94A3B8;
+  --ep-accent: #818CF8;
+  --ep-accent-strong: #6366F1;
+  --ep-accent-hover: #A5B4FC;
+  --ep-accent-2: #38BDF8;
+  --ep-accent-soft: color-mix(in srgb, var(--ep-accent) 16%, transparent);
+  --ep-accent-glow: color-mix(in srgb, var(--ep-accent) 25%, transparent);
+  --ep-on-accent: #FFFFFF;
+  --ep-overlay: rgba(0, 0, 0, .68);
+  --ep-nav-glass: color-mix(in srgb, var(--ep-surface) 94%, transparent);
+  --ep-success: #4ADE80;
+  --ep-success-soft: #123B2B;
+  --ep-warning: #FBBF24;
+  --ep-warning-soft: #493516;
+  --ep-danger: #F87171;
+  --ep-danger-soft: #4A2028;
+  --ep-info: #38BDF8;
+  --ep-info-soft: #12384C;
+  --ep-chart-1: #818CF8;
+  --ep-chart-2: #38BDF8;
+  --ep-chart-3: #FBBF24;
+  --ep-chart-4: #4ADE80;
+  --ep-chart-5: #FB7185;
+  --ep-chart-6: #C4B5FD;
+  --ep-shadow-sm: 0 1px 2px rgba(0, 0, 0, .18);
+  --ep-shadow-md: 0 8px 22px rgba(0, 0, 0, .22);
+  --ep-shadow-lg: 0 18px 48px rgba(0, 0, 0, .32);
+  --ep-shadow-overlay: 0 26px 72px rgba(0, 0, 0, .48);
+}

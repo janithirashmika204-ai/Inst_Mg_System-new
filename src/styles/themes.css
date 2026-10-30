@@ -1,0 +1,53 @@
+/* Theme-aware surfaces and states. Token values live in design-tokens.css. */
+:root[data-theme="dark"] body { background: var(--ep-bg); }
+:root[data-theme="dark"] .app-shell { background: var(--ep-bg); }
+.app-shell[data-theme="dark"] .ep-horizontal-nav-shell { background: var(--ep-nav-glass) !important; border-bottom-color: var(--ep-border) !important; box-shadow: 0 4px 18px rgba(0,0,0,.2) !important; }
+.app-shell[data-theme="dark"] .ep-sidebar-nav { background: linear-gradient(180deg, #243247, #1B293D) !important; border-color: var(--ep-border) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 7px 18px rgba(0,0,0,.2) !important; }
+.app-shell[data-theme="dark"] .ep-sidebar-nav-item:not(.is-active) { color: var(--ep-muted) !important; }
+.app-shell[data-theme="dark"] .ep-sidebar-nav-item:not(.is-active):hover { color: var(--ep-text) !important; background: rgba(255,255,255,.06) !important; }
+.app-shell[data-theme="dark"] .ep-horizontal-nav-brand > div:last-child > div:first-child,
+.app-shell[data-theme="dark"] .ep-horizontal-nav-user > div:first-child { color: var(--ep-text) !important; }
+.app-shell[data-theme="dark"] .ep-horizontal-nav-brand > div:last-child > div:last-child,
+.app-shell[data-theme="dark"] .ep-horizontal-nav-user > div:last-child { color: var(--ep-muted-soft) !important; }
+.app-shell[data-theme="dark"] .app-main,
+.app-shell[data-theme="dark"] .app-main h1,
+.app-shell[data-theme="dark"] .app-main h2,
+.app-shell[data-theme="dark"] .app-main h3,
+.app-shell[data-theme="dark"] .app-main h4 { color: var(--ep-text) !important; }
+.app-shell[data-theme="dark"] .app-main section,
+.app-shell[data-theme="dark"] .app-main .stat-card,
+.app-shell[data-theme="dark"] .app-main .section-card,
+.app-shell[data-theme="dark"] .app-main [class*="card"]:not(.ep-login-feature):not(.edupeak-id-card),
+.app-shell[data-theme="dark"] .dashboard-analytics-grid > div,
+.app-shell[data-theme="dark"] .dashboard-lower-grid > div {
+  background: var(--ep-card) !important; border-color: var(--ep-border) !important; color: var(--ep-text) !important; box-shadow: var(--ep-shadow-sm) !important;
+}
+.app-shell[data-theme="dark"] .app-main input:not([type="checkbox"]):not([type="radio"]),
+.app-shell[data-theme="dark"] .app-main select,
+.app-shell[data-theme="dark"] .app-main textarea,
+.app-shell[data-theme="dark"] .modal-panel input:not([type="checkbox"]):not([type="radio"]),
+.app-shell[data-theme="dark"] .modal-panel select,
+.app-shell[data-theme="dark"] .modal-panel textarea { background: var(--ep-bg) !important; color: var(--ep-text) !important; border-color: var(--ep-border-strong) !important; }
+.app-shell[data-theme="dark"] select option { background: var(--ep-card); color: var(--ep-text); }
+.app-shell[data-theme="dark"] .app-main thead th { background: var(--ep-card-raised) !important; color: var(--ep-muted) !important; border-color: var(--ep-border) !important; }
+.app-shell[data-theme="dark"] .app-main tbody td { border-color: var(--ep-border) !important; }
+.app-shell[data-theme="dark"] .app-main tbody tr:hover td { background: var(--ep-accent-soft) !important; }
+.app-shell[data-theme="dark"] .ui-button.ui-button--outline { background: var(--ep-card-raised) !important; color: var(--ep-text) !important; border-color: var(--ep-border-strong) !important; }
+.app-shell[data-theme="dark"] .modal-backdrop { background: rgba(0,0,0,.68) !important; }
+.app-shell[data-theme="dark"] .ep-profile-trigger:hover,
+.app-shell[data-theme="dark"] .ep-profile-dropdown.is-open .ep-profile-trigger { background: var(--ep-card-raised); border-color: var(--ep-border-strong); }
+.app-shell[data-theme="dark"] .ep-profile-menu { box-shadow: 0 24px 60px rgba(0,0,0,.48); }
+.app-shell[data-theme="dark"] .ep-theme-toggle-track { background: var(--ep-card-raised) !important; color: var(--ep-muted) !important; }
+.app-shell[data-theme="dark"] .ep-theme-toggle-thumb { transform: translateX(28px) !important; background: linear-gradient(145deg, #64748B, #334155) !important; }
+.app-shell[data-theme="dark"] .ep-theme-toggle-sun { color: var(--ep-muted-soft) !important; }
+.app-shell[data-theme="dark"] .ep-theme-toggle-moon { color: var(--ep-on-accent) !important; }
+.app-shell[data-theme="light"] .ep-theme-toggle-sun { color: var(--ep-accent) !important; }
+.app-shell[data-theme="light"] .ep-theme-toggle-moon { color: var(--ep-muted-soft) !important; }
+
+/* Shared page backdrop and header search adapt to either theme. */
+:root[data-theme="dark"] .app-content-shell::before,
+.app-shell[data-theme="dark"] .app-content-shell::before { opacity: .42; }
+:root[data-theme="light"] .app-content-shell::before,
+.app-shell[data-theme="light"] .app-content-shell::before { opacity: .18; }
+.app-shell[data-theme="dark"] .ep-header-search-trigger { background: var(--ep-card); color: var(--ep-muted); border-color: var(--ep-border); }
+.app-shell[data-theme="dark"] .ep-header-search-trigger:hover { background: var(--ep-accent-soft); color: var(--ep-accent); border-color: var(--ep-accent); }

@@ -1,0 +1,26 @@
+/* Predictable browser defaults and application-wide accessibility primitives. */
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { width: 100%; height: 100%; min-width: 320px; min-height: 0; margin: 0; }
+html { background: var(--ep-bg); scroll-behavior: smooth; }
+body {
+  min-height: 100dvh;
+  overflow: hidden;
+  color: var(--ep-text);
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--ep-bg);
+  font-family: "Anthropic Sans", "Segoe UI", system-ui, sans-serif;
+  letter-spacing: -.006em;
+  font-feature-settings: "cv11", "ss01";
+}
+button, input, select, textarea { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+::selection { color: var(--ep-on-accent); background: var(--ep-accent); }
+:focus-visible { outline: 2px solid var(--ep-accent); outline-offset: 2px; }
+button:disabled, input:disabled, select:disabled, textarea:disabled { cursor: not-allowed; }
+img, svg, canvas, video { max-width: 100%; }
+* { scrollbar-width: thin; scrollbar-color: var(--ep-border-strong) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 999px; background: var(--ep-border-strong); background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--ep-muted-soft); background-clip: padding-box; }

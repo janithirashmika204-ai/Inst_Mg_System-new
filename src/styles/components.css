@@ -1,0 +1,115 @@
+/* Shared cards, buttons, forms, tables, status and dialog components. */
+.stat-card {
+  position: relative; min-width: 0; min-height: 142px; padding: 18px !important; gap: 13px !important;
+  overflow: hidden; border: 1px solid var(--ep-border) !important; border-radius: var(--ep-radius-lg) !important;
+  background: var(--ep-card) !important; box-shadow: var(--ep-shadow-sm) !important;
+  transition: transform var(--ep-transition), border-color var(--ep-transition), box-shadow var(--ep-transition);
+}
+.stat-card::after { content: ""; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, var(--ep-accent), transparent 72%); opacity: .35; pointer-events: none; }
+.stat-card:hover { transform: translateY(-2px); border-color: var(--ep-accent); box-shadow: var(--ep-shadow-md) !important; }
+.stat-icon { width: 38px !important; height: 38px !important; border-radius: 11px !important; }
+.stat-icon svg { width: 18px; height: 18px; }
+.ui-button {
+  min-height: 36px; border: 1px solid var(--ep-accent) !important; border-radius: var(--ep-radius-sm) !important;
+  padding: 8px 15px !important; background: var(--ep-accent) !important; color: var(--ep-on-accent) !important;
+  box-shadow: 0 3px 10px var(--ep-accent-glow) !important; font-weight: 680 !important;
+  transition: background var(--ep-transition), border-color var(--ep-transition), box-shadow var(--ep-transition), transform var(--ep-transition);
+}
+.ui-button:not(:disabled):hover { background: var(--ep-accent-hover) !important; border-color: var(--ep-accent-hover) !important; box-shadow: 0 6px 16px var(--ep-accent-glow) !important; transform: translateY(-1px); }
+.ui-button:not(:disabled):active { transform: translateY(0); box-shadow: inset 0 1px 3px rgba(0,0,0,.16) !important; }
+.ui-button.ui-button--outline { background: var(--ep-surface) !important; color: var(--ep-text) !important; border-color: var(--ep-border-strong) !important; box-shadow: none !important; }
+.ui-button.ui-button--outline:not(:disabled):hover { background: var(--ep-accent-soft) !important; color: var(--ep-accent) !important; border-color: var(--ep-accent) !important; }
+.ui-button:disabled { opacity: .55; box-shadow: none !important; }
+.ui-badge { border-radius: 999px !important; padding: 3px 9px !important; font-size: 10.5px !important; font-weight: 700 !important; }
+.icon-btn { min-width: 32px; min-height: 32px; border-radius: var(--ep-radius-sm) !important; background: var(--ep-surface); color: var(--ep-muted); border-color: var(--ep-border-strong); transition: background var(--ep-transition), color var(--ep-transition), border-color var(--ep-transition); }
+.icon-btn:hover { background: var(--ep-accent-soft) !important; color: var(--ep-accent) !important; border-color: var(--ep-accent) !important; }
+.app-main section, .app-main .section-card, .app-main [class*="card"]:not(.ep-login-feature):not(.edupeak-id-card) { border-color: var(--ep-border); }
+.app-main section { border-radius: var(--ep-radius-lg); }
+.app-main section[style*="background"], .app-main .section-card { box-shadow: var(--ep-shadow-sm); }
+.app-main button[style*="text-align: left"] { border-radius: var(--ep-radius-md) !important; transition: transform var(--ep-transition), box-shadow var(--ep-transition), border-color var(--ep-transition) !important; }
+.app-main button[style*="text-align: left"]:hover { transform: translateY(-1px); box-shadow: var(--ep-shadow-md); }
+.app-main input:not([type="checkbox"]):not([type="radio"]), .app-main select, .app-main textarea,
+.modal-panel input:not([type="checkbox"]):not([type="radio"]), .modal-panel select, .modal-panel textarea {
+  min-width: 0; min-height: var(--ep-control-height); border: 1px solid var(--ep-border-strong) !important;
+  border-radius: var(--ep-radius-sm) !important; background: var(--ep-surface) !important; color: var(--ep-text) !important;
+  box-shadow: inset 0 1px 2px rgba(15,23,42,.025) !important; font-family: inherit !important;
+  transition: border-color var(--ep-transition), box-shadow var(--ep-transition), background var(--ep-transition);
+}
+.app-main textarea, .modal-panel textarea { min-height: 90px; }
+.app-main input:focus, .app-main select:focus, .app-main textarea:focus,
+.modal-panel input:focus, .modal-panel select:focus, .modal-panel textarea:focus {
+  border-color: var(--ep-accent) !important; outline: 0 !important; box-shadow: 0 0 0 3px var(--ep-accent-soft) !important;
+}
+.app-main input::placeholder, .app-main textarea::placeholder, .modal-panel input::placeholder, .modal-panel textarea::placeholder { color: var(--ep-muted-soft) !important; opacity: 1; }
+.app-main input[type="checkbox"], .app-main input[type="radio"], .modal-panel input[type="checkbox"], .modal-panel input[type="radio"] { accent-color: var(--ep-accent); }
+select option { background: var(--ep-surface); color: var(--ep-text); }
+.app-main table { width: 100%; border-collapse: separate; border-spacing: 0; color: var(--ep-text); font-variant-numeric: tabular-nums; }
+.app-main thead th { padding: 11px 12px !important; background: var(--ep-card-raised) !important; color: var(--ep-muted) !important; border-bottom: 1px solid var(--ep-border) !important; font-size: 10.5px !important; font-weight: 760 !important; letter-spacing: .05em; text-transform: uppercase; }
+.app-main tbody td { padding: 10px 12px; border-bottom: 1px solid var(--ep-border); font-size: 12.5px; }
+.app-main tbody tr { transition: background-color var(--ep-transition-fast); }
+.app-main tbody tr:hover td { background: var(--ep-accent-soft) !important; }
+.app-main tbody tr:last-child td { border-bottom: 0 !important; }
+.modal-backdrop { z-index: 1000; background: rgba(15,23,42,.58) !important; backdrop-filter: blur(7px); }
+.modal-panel { border: 1px solid var(--ep-border) !important; border-radius: var(--ep-radius-xl) !important; background: var(--ep-surface) !important; color: var(--ep-text) !important; box-shadow: var(--ep-shadow-overlay) !important; animation: ep-modal-enter 220ms cubic-bezier(.22,1,.36,1) both; }
+.modal-panel > div:first-child { background: var(--ep-surface) !important; border-color: var(--ep-border) !important; }
+/* Floating theme switch — intentionally fixed so it never consumes page height. */
+.ep-theme-toggle {
+  position: fixed !important;
+  z-index: 1100 !important;
+  right: 18px !important;
+  bottom: 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 9px !important;
+  width: max-content !important;
+  max-width: calc(100vw - 24px) !important;
+  min-width: 0 !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  margin: 0 !important;
+  padding: 6px 14px 6px 7px !important;
+  border: 1px solid var(--ep-border-strong) !important;
+  border-radius: 999px !important;
+  background: var(--ep-surface) !important;
+  color: var(--ep-text) !important;
+  box-shadow: var(--ep-shadow-md) !important;
+  font: inherit !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+}
+.ep-theme-toggle:hover { border-color: var(--ep-accent) !important; box-shadow: var(--ep-shadow-lg) !important; }
+.ep-theme-toggle:focus-visible { outline: 2px solid var(--ep-accent) !important; outline-offset: 3px !important; }
+.ep-theme-toggle-track {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex: 0 0 60px !important;
+  width: 60px !important;
+  height: 32px !important;
+  padding: 0 7px !important;
+  border: 1px solid var(--ep-border) !important;
+  border-radius: 999px !important;
+  background: var(--ep-card-raised) !important;
+  color: var(--ep-muted) !important;
+}
+.ep-theme-toggle-sun,
+.ep-theme-toggle-moon { position: relative !important; z-index: 1 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 16px !important; height: 16px !important; }
+.ep-theme-toggle-thumb {
+  position: absolute !important;
+  top: 2px !important;
+  left: 2px !important;
+  z-index: 0 !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(145deg, var(--ep-accent), var(--ep-accent-strong)) !important;
+  box-shadow: 0 2px 6px var(--ep-accent-glow) !important;
+  transition: transform 180ms ease !important;
+}
+.ep-theme-toggle.is-dark .ep-theme-toggle-thumb { transform: translateX(28px) !important; }
+.ep-theme-toggle-text { display: inline-block !important; }
