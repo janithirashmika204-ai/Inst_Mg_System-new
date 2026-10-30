@@ -1,0 +1,10 @@
+{
+  "description": "EduPeak Institute Management System for student records, classes, attendance, fees, and academic administration.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
