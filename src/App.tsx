@@ -1,5 +1,7 @@
 // @ts-nocheck
 import { useState, useRef, useEffect, createContext, useContext } from "react";
+import { supabase, isSupabaseConfigured } from "./lib/supabaseClient";
+import { loadInstituteStore, syncCollectionDelta, rememberInstituteSnapshots, loadMembership, loadUserProfile, loadInstituteSettings, saveInstituteSettings, uiRole } from "./lib/edupeakRepository";
 import {
   Banknote, Bell, BookOpen, Building2, CalendarDays, CalendarPlus,
   ChartNoAxesCombined, Check, CheckCircle2, ChevronRight, ClipboardCheck,
@@ -359,6 +361,31 @@ const loadStore = () => {
 };
 const StoreCtx = createContext(null);
 const useStore = () => useContext(StoreCtx);
+
+// React-compatible store setter that keeps the existing page components intact
+// while synchronizing only changed records to the active Supabase institute.
+const useCloudCollection = (initialValue, collectionName, cloudScopeRef, onSyncError) => {
+  const [records, setRecords] = useState(initialValue);
+  const recordsRef = useRef(records);
+  const hydrate = (nextRecords) => {
+    const safeRecords = Array.isArray(nextRecords) ? nextRecords : [];
+    recordsRef.current = safeRecords;
+    setRecords(safeRecords);
+  };
+  const setCollection = (updater) => {
+    const previous = recordsRef.current;
+    const next = typeof updater === "function" ? updater(previous) : updater;
+    if (!Array.isArray(next)) return;
+    recordsRef.current = next;
+    setRecords(next);
+    const scope = cloudScopeRef.current;
+    if (scope?.instituteId) {
+      syncCollectionDelta(collectionName, scope.instituteId, previous, next)
+        .catch((error) => onSyncError?.(error?.message || `Could not save ${collectionName}.`));
+    }
+  };
+  return [records, setCollection, hydrate];
+};
 
 /* ─── Registry helpers ────────────────────────────────────── */
 const REG_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -3759,6 +3786,10 @@ const DEFAULT_ROLE_PERMISSIONS = {
   "Administrator":["Dashboard","Students","Teachers","Classes & Timetable","Attendance","Fees","Exams","Analytics","Data Import & Capture"],
   "Manager":["Dashboard","Students","Teachers","Classes & Timetable","Attendance","Fees","Exams"],
   "Teacher":["Dashboard","Classes & Timetable","Attendance","Exams"],
+  "Registrar":["Dashboard","Students","Classes & Timetable","Attendance","Data Import & Capture"],
+  "Accountant":["Dashboard","Students","Fees","Analytics"],
+  "Attendance Staff":["Dashboard","Students","Classes & Timetable","Attendance"],
+  "Viewer":["Dashboard","Analytics"],
   "Student":[],"Parent":[]
 };
 const DEFAULT_SMS_TEMPLATES = {
@@ -3772,7 +3803,7 @@ const loadAdvancedSettings = () => {
 };
 
 /* ─── Settings ⑨ individual windows ──────────────────────── */
-const SettingsPage = ({currentUser}) => {
+const SettingsPage = ({currentUser,initialSettings}) => {
   const [section,setSection] = useState(null);
   const store = useStore();
   const restoreRef = useRef(null);
@@ -3784,21 +3815,35 @@ const SettingsPage = ({currentUser}) => {
   const [upgradeMsg,setUpgradeMsg] = useState("");
   const [branchForm,setBranchForm] = useState({name:"",address:"",phone:"",status:"Active"});
   const [showBranchForm,setShowBranchForm] = useState(false);
-  const [rolesDraft,setRolesDraft] = useState(()=>loadAdvancedSettings().rolePermissions);
-  const [profileDraft,setProfileDraft] = useState(()=>loadAdvancedSettings().institute);
-  const [settings,setSettings] = useState(()=>loadAdvancedSettings());
-  const [smsDraft,setSmsDraft] = useState(()=>loadAdvancedSettings().smsTemplates);
+  const [rolesDraft,setRolesDraft] = useState(()=>({...DEFAULT_ROLE_PERMISSIONS,...(initialSettings?.rolePermissions || loadAdvancedSettings().rolePermissions)}));
+  const [profileDraft,setProfileDraft] = useState(()=>initialSettings?.institute || loadAdvancedSettings().institute);
+  const [settings,setSettings] = useState(()=>({
+    ...loadAdvancedSettings(),
+    ...(initialSettings || {}),
+    rolePermissions: {...DEFAULT_ROLE_PERMISSIONS,...(initialSettings?.rolePermissions || {})},
+    smsTemplates: {...DEFAULT_SMS_TEMPLATES,...(initialSettings?.smsTemplates || {})},
+  }));
+  const [smsDraft,setSmsDraft] = useState(()=>({...DEFAULT_SMS_TEMPLATES,...(initialSettings?.smsTemplates || loadAdvancedSettings().smsTemplates)}));
   const [smsGatewayDraft,setSmsGatewayDraft] = useState({provider:"Dialog",senderId:"",apiKey:"",whatsappPhoneId:"",whatsappToken:""});
   const [gatewayDraft,setGatewayDraft] = useState({});
   const role = currentUser?.role || "Manager";
   const isSuper = role === "Super Administrator";
   const canAdmin = isSuper || role === "Administrator";
-  useEffect(()=>{try{localStorage.setItem(ADVANCED_SETTINGS_KEY,JSON.stringify(settings));}catch{}},[settings]);
+  const initialSettingsSnapshot = useRef(JSON.stringify(settings));
+  useEffect(()=>{
+    try{localStorage.setItem(ADVANCED_SETTINGS_KEY,JSON.stringify(settings));}catch{}
+    const canManageSettings = currentUser?.role === "Super Administrator" || currentUser?.role === "Administrator";
+    store.setInitialSettings?.(settings);
+    if(store.instituteId && canManageSettings && JSON.stringify(settings) !== initialSettingsSnapshot.current){
+      saveInstituteSettings(store.instituteId,settings)
+        .catch(error=>store.onSyncError?.(error?.message || "Could not save institute settings."));
+    }
+  },[settings,store.instituteId,currentUser?.role]);
   const updateProfile=k=>e=>setProfileDraft(v=>({...v,[k]:e.target.value}));
   const updateSms=k=>e=>setSmsDraft(v=>({...v,[k]:e.target.value}));
   const updateBranch=k=>e=>setBranchForm(v=>({...v,[k]:e.target.value}));
   const downloadBackup = () => {
-    const data = {app:"edupeak",version:3,exportedAt:new Date().toISOString(),students:store.students,teachers:store.teachers,classes:store.classes,fees:store.fees,attendance:store.attendance,exams:store.exams,settings:loadAdvancedSettings(),readNotificationIds:JSON.parse(localStorage.getItem("edupeak.notifications.read.v1")||"[]")};
+    const data = {app:"edupeak",version:3,exportedAt:new Date().toISOString(),students:store.students,teachers:store.teachers,classes:store.classes,fees:store.fees,attendance:store.attendance,exams:store.exams,settings:settings,readNotificationIds:JSON.parse(localStorage.getItem("edupeak.notifications.read.v1")||"[]")};
     const url = URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));
     const a = document.createElement("a"); a.href = url; a.download = `edupeak-backup-${isoDate()}.json`; a.click(); URL.revokeObjectURL(url);
     setBackupMsg("Backup file created from the current records.");
@@ -3937,14 +3982,15 @@ const NAV=[
 /* ─── Root App ⑧ search nav ───────────────────────────────── */
 export default function App() {
   const _saved = useRef(loadStore()).current;
-  const [students,setStudents]     = useState(_saved?.students??INIT_STUDENTS);
-  const [teachers,setTeachers]     = useState(_saved?.teachers??INIT_TEACHERS);
-  const [classes,setClasses]       = useState(_saved?.classes??INIT_CLASSES);
-  const [fees,setFees]             = useState(_saved?.fees??INIT_FEES);
-  const [attendance,setAttendance] = useState(_saved?.attendance??[]);
-  const [exams,setExams]           = useState(_saved?.exams??INIT_EXAMS);
+  const cloudScopeRef = useRef(null);
+  const [cloudSyncError,setCloudSyncError] = useState("");
+  const [students,setStudents,hydrateStudents] = useCloudCollection(_saved?.students??INIT_STUDENTS,"students",cloudScopeRef,setCloudSyncError);
+  const [teachers,setTeachers,hydrateTeachers] = useCloudCollection(_saved?.teachers??INIT_TEACHERS,"teachers",cloudScopeRef,setCloudSyncError);
+  const [classes,setClasses,hydrateClasses] = useCloudCollection(_saved?.classes??INIT_CLASSES,"classes",cloudScopeRef,setCloudSyncError);
+  const [fees,setFees,hydrateFees] = useCloudCollection(_saved?.fees??INIT_FEES,"fees",cloudScopeRef,setCloudSyncError);
+  const [attendance,setAttendance,hydrateAttendance] = useCloudCollection(_saved?.attendance??[],"attendance",cloudScopeRef,setCloudSyncError);
+  const [exams,setExams,hydrateExams] = useCloudCollection(_saved?.exams??INIT_EXAMS,"exams",cloudScopeRef,setCloudSyncError);
   useEffect(()=>{try{localStorage.setItem(STORE_KEY,JSON.stringify({students,teachers,classes,fees,attendance,exams}));}catch{}},[students,teachers,classes,fees,attendance,exams]);
-  const store = {students,setStudents,teachers,setTeachers,classes,setClasses,fees,setFees,attendance,setAttendance,exams,setExams};
   const [page,setPage]         = useState("dashboard");
   const [theme,setTheme] = useState(() => {
     try {
@@ -3976,11 +4022,124 @@ export default function App() {
   const [authenticated,setAuthenticated] = useState(false);
   const [currentUser,setCurrentUser] = useState(null);
   const [loginError,setLoginError] = useState("");
+  const [loginBusy,setLoginBusy] = useState(false);
+  const [authLoading,setAuthLoading] = useState(isSupabaseConfigured);
+  const [cloudSettings,setCloudSettings] = useState(null);
   const [accessRevision,setAccessRevision] = useState(0);
+
+  const hydrateWorkspace = async (authUser) => {
+    if (!authUser?.id) throw new Error("The authenticated Supabase user is missing an ID.");
+    const membership = await loadMembership(authUser.id);
+    const [workspace, profile, remoteSettings] = await Promise.all([
+      loadInstituteStore(membership.institute_id, membership.role),
+      loadUserProfile(authUser.id),
+      loadInstituteSettings(membership.institute_id),
+    ]);
+    rememberInstituteSnapshots(membership.institute_id, workspace);
+    cloudScopeRef.current = { instituteId: membership.institute_id, userId: authUser.id };
+    hydrateStudents(workspace.students || []);
+    hydrateTeachers(workspace.teachers || []);
+    hydrateClasses(workspace.classes || []);
+    hydrateFees(workspace.fees || []);
+    hydrateAttendance(workspace.attendance || []);
+    hydrateExams(workspace.exams || []);
+    setCloudSettings(remoteSettings || {
+      institute: { name: "", registrationNumber: "", address: "", phone: "", email: "" },
+      rolePermissions: DEFAULT_ROLE_PERMISSIONS,
+      smsTemplates: DEFAULT_SMS_TEMPLATES,
+      branches: [],
+      language: "English",
+    });
+    setCloudSyncError("");
+    setCurrentUser({
+      id: authUser.id,
+      email: authUser.email || profile?.email || "",
+      username: profile?.username || authUser.email || "user",
+      fullName: profile?.full_name || "",
+      role: uiRole(membership.role),
+      roleKey: membership.role,
+      instituteId: membership.institute_id,
+    });
+    setAuthenticated(true);
+  };
+
+  const resetWorkspace = () => {
+    cloudScopeRef.current = null;
+    setAuthenticated(false);
+    setCurrentUser(null);
+    setCloudSettings(null);
+    setStudents([]); setTeachers([]); setClasses([]); setFees([]); setAttendance([]); setExams([]);
+    setCloudSyncError("");
+  };
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    setLoginError("");
+    if (!isSupabaseConfigured || !supabase) {
+      setLoginError("Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to your .env.local file, then restart EduPeak.");
+      return;
+    }
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("login") || "").trim().toLowerCase();
+    const password = String(formData.get("password") || "");
+    if (!email || !password) {
+      setLoginError("Enter your email address and password.");
+      return;
+    }
+    setLoginBusy(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      if (!data.user) throw new Error("Supabase did not return an authenticated user.");
+      await hydrateWorkspace(data.user);
+      setLoginError("");
+    } catch (error) {
+      cloudScopeRef.current = null;
+      await supabase.auth.signOut().catch(() => undefined);
+      setLoginError(error?.message || "Sign in failed. Check your credentials and institute access.");
+    } finally {
+      setLoginBusy(false);
+    }
+  };
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) {
+      setAuthLoading(false);
+      return;
+    }
+    let active = true;
+    const restoreSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (active && data.session?.user) await hydrateWorkspace(data.session.user);
+      } catch (error) {
+        if (active) setLoginError(error?.message || "Could not restore your secure session.");
+        await supabase.auth.signOut().catch(() => undefined);
+      } finally {
+        if (active) setAuthLoading(false);
+      }
+    };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") resetWorkspace();
+    });
+    restoreSession();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const [readNotificationIds,setReadNotificationIds] = useState(()=>{try{return JSON.parse(localStorage.getItem("edupeak.notifications.read.v1")||"[]");}catch{return []}});
   const [smsTarget,setSmsTarget] = useState(null);
   const [smsMessage,setSmsMessage] = useState("");
   const [smsActionStatus,setSmsActionStatus] = useState("");
+  const store = {
+    students,setStudents,teachers,setTeachers,classes,setClasses,fees,setFees,attendance,setAttendance,exams,setExams,
+    instituteId: currentUser?.instituteId || null,
+    initialSettings: cloudSettings,
+    setInitialSettings: setCloudSettings,
+    onSyncError: setCloudSyncError,
+  };
   useEffect(()=>{try{localStorage.setItem("edupeak.notifications.read.v1",JSON.stringify(readNotificationIds));}catch{}},[readNotificationIds]);
   useEffect(()=>{
     if(!profileMenuOpen)return;
@@ -4028,7 +4187,9 @@ export default function App() {
     };
   },[headerSearchOpen]);
   useEffect(()=>{const h=()=>setAccessRevision(v=>v+1);window.addEventListener("edupeak-settings-updated",h);return()=>window.removeEventListener("edupeak-settings-updated",h);},[]);
-  const permissionConfig = loadAdvancedSettings().rolePermissions || DEFAULT_ROLE_PERMISSIONS;
+  const permissionConfig = cloudSettings?.rolePermissions
+    ? {...DEFAULT_ROLE_PERMISSIONS,...cloudSettings.rolePermissions}
+    : (loadAdvancedSettings().rolePermissions || DEFAULT_ROLE_PERMISSIONS);
   const allowedModules = currentUser?(permissionConfig[currentUser.role]||DEFAULT_ROLE_PERMISSIONS[currentUser.role]||[]):ROLE_MODULES;
   const visibleNav = NAV.filter(n=>n.id==="settings"||!currentUser||allowedModules.includes(n.permission||(n.id==="classes"?"Classes & Timetable":n.label)));
   const navSignature = visibleNav.map(n=>n.id).join("|");
@@ -4062,7 +4223,7 @@ export default function App() {
   const prepareSms=(st,notificationId)=>{
     if(notificationId)setReadNotificationIds(prev=>prev.includes(notificationId)?prev:[...prev,notificationId]);
     setNotifOpen(false);
-    const templ=loadAdvancedSettings().smsTemplates?.fee||DEFAULT_SMS_TEMPLATES.fee;
+    const templ=cloudSettings?.smsTemplates?.fee||loadAdvancedSettings().smsTemplates?.fee||DEFAULT_SMS_TEMPLATES.fee;
     const month=notificationMonth;
     const message=templ.replace(/\{student\}/g,st.name||"").replace(/\{amount\}/g,String(studentMonthlyFee(st,classes))).replace(/\{month\}/g,month).replace(/\{branch\}/g,st.branch||"");
     setSmsTarget(st);setSmsMessage(message);setSmsActionStatus("");
@@ -4108,7 +4269,7 @@ export default function App() {
     exams:      <ExamsPage/>,
     analytics:  <AnalyticsPage/>,
     import:     <DataImportPage/>,
-    settings:   <SettingsPage currentUser={currentUser}/>,
+    settings:   <SettingsPage currentUser={currentUser} initialSettings={cloudSettings}/>,
   };
 
   if (!authenticated) {
@@ -4145,50 +4306,8 @@ return (
             management system.
           </p>
 
-          <form
-            method="post"
-            onSubmit={(e) => {
-              e.preventDefault();
-
-              const fd = new FormData(e.currentTarget);
-              const u = String(fd.get("login") || "")
-                .trim()
-                .toLowerCase();
-              const p = String(fd.get("password") || "");
-
-              const users = {
-                super_admin: {
-                  password: "EduPeak#SA2026",
-                  role: "Super Administrator",
-                },
-                admin: {
-                  password: "EduPeak#Admin26",
-                  role: "Administrator",
-                },
-                manager: {
-                  password: "EduPeak#Mgr2026",
-                  role: "Manager",
-                },
-                maneger: {
-                  password: "EduPeak#Mgr2026",
-                  role: "Manager",
-                },
-              };
-
-              if (users[u] && users[u].password === p) {
-                setCurrentUser({
-                  username: u,
-                  role: users[u].role,
-                });
-                setAuthenticated(true);
-                setLoginError("");
-              } else {
-                setLoginError(
-                  "Invalid username or password. Check the username and password, then try again."
-                );
-              }
-            }}
-          >
+          <form method="post" onSubmit={handleLogin}>
+            {authLoading && <div className="ep-login-error" role="status">Checking your secure Supabase session…</div>}
             {loginError && (
               <div className="ep-login-error" role="alert">
                 {loginError}
@@ -4201,7 +4320,7 @@ return (
                 className="ep-login-label"
                 htmlFor="edupeak-login"
               >
-                Username
+                Email address
               </label>
 
               <div className="ep-login-input-wrap">
@@ -4222,9 +4341,9 @@ return (
                   required
                   className="ep-login-control"
                   name="login"
-                  type="text"
-                  autoComplete="username"
-                  placeholder="Enter your username"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Enter your email address"
                 />
               </div>
             </div>
@@ -4263,7 +4382,7 @@ return (
               </div>
             </div>
 
-               <button class="ep-login-submit" type="submit" name="action_login" >Log In
+               <button class="ep-login-submit" type="submit" name="action_login" disabled={loginBusy || authLoading}>{loginBusy ? "Signing in…" : "Log In"}
                  <svg class="ep-login-submit__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                  <path d="m10 17 5-5-5-5"/><path d="M15 12H3"/></svg>
@@ -4581,9 +4700,9 @@ return (
                 className="ep-profile-menu-item is-danger"
                 onClick={()=>{
                   setProfileMenuOpen(false);
-                  setAuthenticated(false);
-                  setCurrentUser(null);
                   setPage("dashboard");
+                  if (supabase) supabase.auth.signOut().catch((error) => setLoginError(error?.message || "Sign out failed."));
+                  else resetWorkspace();
                 }}
               >
                 <LogOut size={17} aria-hidden="true"/>
@@ -4596,6 +4715,7 @@ return (
 
       {/* Main */}
       <div className="app-content-shell">
+        {cloudSyncError && <div role="alert" className="ep-cloud-sync-error">Database sync issue: {cloudSyncError}. Your current screen remains available; resolve the connection before continuing with critical records.</div>}
         {/* Page content */}
         <main key={page} className="page-enter app-main">
           {pageAllowed?pages[page]:<div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:28,textAlign:"center",maxWidth:650,margin:"40px auto"}}><LockKeyhole size={30} color={C.amber} style={{margin:"0 auto 12px"}}/><h2 style={{fontSize:18,color:C.text,margin:"0 0 8px"}}>Access restricted</h2><p style={{fontSize:13,color:C.muted,lineHeight:1.6}}>Your current role is not permitted to open this module. Contact a Super Administrator if this access is required.</p><Btn label="Return to Dashboard" onClick={()=>setPage("dashboard")}/></div>}
